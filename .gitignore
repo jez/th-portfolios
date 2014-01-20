@@ -1,0 +1,8 @@
+*.sw*
+access-codes.json
+runserver
+policy.py
+node_modules/
+node_modules/*
+.DS_Store
+downloader.sh

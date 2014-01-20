@@ -1,0 +1,116 @@
+extends base
+block header
+    link(rel="stylesheet" type="text/css" href="/css/index.css")
+block content
+    .container
+        .jumbotron#title
+            h1.text-center TartanHacks 
+                small Portfolio Manager
+        .row
+            .col-md-8.col-md-offset-2
+                form.form-horizontal#form(role="form", method="post", enctype="multipart/form-data")
+                    .form-group
+                        label.col-sm-3.control-label Name*
+                        .col-sm-9
+                            input.form-control#input-name(type="text", placeholder="John Smith")
+                    .form-group
+                        label.col-sm-3.control-label Preferred Email*
+                        .col-sm-9
+                            input.form-control#input-email(type="email", placeholder="john@smith.me")
+                    .form-group
+                        label.col-sm-3.control-label Andrew ID*
+                        .col-sm-9
+                            input.form-control#input-andrewid(type="text", placeholder="jsmith")
+                    .form-group
+                        label.col-sm-3.control-label Class standing*
+                        .col-sm-9
+                            .btn-group#input-class(data-toggle="buttons")
+                                label.btn.btn-default
+                                    input(type="radio", name="options")
+                                    | Freshman
+                                label.btn.btn-default
+                                    input(type="radio", name="options")
+                                    | Sophomore
+                                label.btn.btn-default
+                                    input(type="radio", name="options")
+                                    | Junior
+                                label.btn.btn-default
+                                    input(type="radio", name="options")
+                                    | Senior
+                    .form-group
+                        label.col-sm-3.control-label Major*
+                        .col-sm-9
+                            input.form-control#input-major(type="text", placeholder="Computer Science")
+                    .form-group
+                        label.col-sm-3.control-label Minor/Additional Major
+                        .col-sm-9
+                            input.form-control#input-minor(type="text", placeholder="Human-Computer Interaction")
+                    .form-group
+                        label.col-sm-3.control-label Portfolio
+                        .col-sm-9
+                            input.form-control#input-portfolio(type="text", placeholder="example.com/about")
+                    .form-group
+                        label.col-sm-3.control-label Additional Link
+                        .col-sm-9
+                            input.form-control#input-link(type="text", placeholder="optional")
+                    .form-group
+                        label.col-sm-3.control-label GitHub Profile
+                        .col-sm-9
+                            input.form-control#input-github(type="text", placeholder="jsmith")
+                    .form-group
+                        label.col-sm-3.control-label Resume
+                        .col-sm-9
+                            input.btn.btn-default.form-control#input-file(name="file",type="file")
+                            button.btn.btn-default#input-file-button Upload a PDF
+                            label#input-filename
+                    .form-group
+                        label.col-sm-3.control-label Interested in...
+                        .col-sm-9
+                            .btn-group#input-companies(data-toggle="buttons")
+                                label.btn.btn-default
+                                    input(type="checkbox", name="options")
+                                    | a16z
+                                label.btn.btn-default
+                                    input(type="checkbox", name="options")
+                                    | AWS
+                                label.btn.btn-default
+                                    input(type="checkbox", name="options")
+                                    | Apple
+                                label.btn.btn-default
+                                    input(type="checkbox", name="options")
+                                    | Bloomberg
+                                label.btn.btn-default
+                                    input(type="checkbox", name="options")
+                                    | Dropbox
+                                label.btn.btn-default
+                                    input(type="checkbox", name="options")
+                                    | Facebook
+                                label.btn.btn-default
+                                    input(type="checkbox", name="options")
+                                    | Microsoft
+                    .form-group
+                        .col-sm-offset-3.col-sm-9
+                            button.btn.btn-primary.btn-lg#submit Submit
+    .modal.fade#failure-message(tabindex="-1", role="dialog", aria-labelledby="failure-message", aria-hidden="true")
+        .modal-dialog
+            .modal-content
+                .modal-body
+                    .alert.alert-danger
+                        h4.modal-title Something went wrong...
+                        p Something went wrong when trying to submit your portfolio. It was probably our fault, so just try one more time. If that still doesn't fix it, let me know at jake (at) scottylabs (dot) org. Sorry!
+                        p#error-text
+                .modal-footer
+                    button.btn.btn-default.btn-lg(data-dismiss="modal") Okay
+    .modal.fade#success-message(tabindex="-1", role="dialog", aria-labelledby="success-message", aria-hidden="true")
+        .modal-dialog
+            .modal-content
+                .modal-body
+                    .alert.alert-success
+                        h4.modal-title Congratulations!
+                        p Everything completed successfully. We hope you have a great time at TartanHacks!
+                        p Happy hacking XD
+                .modal-footer
+                    button.btn.btn-default.btn-lg#success-button(data-dismiss="modal") Okay
+
+block script
+    script(src="/js/index.js")
