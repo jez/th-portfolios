@@ -66,28 +66,37 @@ block content
                     .form-group
                         label.col-sm-3.control-label Interested in...
                         .col-sm-9
-                            .btn-group#input-companies(data-toggle="buttons")
-                                label.btn.btn-default
-                                    input(type="checkbox", name="options")
-                                    | a16z
-                                label.btn.btn-default
-                                    input(type="checkbox", name="options")
-                                    | AWS
-                                label.btn.btn-default
-                                    input(type="checkbox", name="options")
-                                    | Apple
-                                label.btn.btn-default
-                                    input(type="checkbox", name="options")
-                                    | Bloomberg
-                                label.btn.btn-default
-                                    input(type="checkbox", name="options")
-                                    | Dropbox
-                                label.btn.btn-default
-                                    input(type="checkbox", name="options")
-                                    | Facebook
-                                label.btn.btn-default
-                                    input(type="checkbox", name="options")
-                                    | Microsoft
+                            .row
+                                .col-md-4
+                                    .checkbox
+                                        label
+                                            input(type="checkbox")
+                                            | a16z
+                                    .checkbox
+                                        label
+                                            input(type="checkbox")
+                                            | AWS
+                                    .checkbox
+                                        label
+                                            input(type="checkbox")
+                                            | Apple
+                                    .checkbox
+                                        label
+                                            input(type="checkbox")
+                                            | Bloomberg
+                                .col-md-4
+                                    .checkbox
+                                        label
+                                            input(type="checkbox")
+                                            | Dropbox
+                                    .checkbox
+                                        label
+                                            input(type="checkbox")
+                                            | Facebook
+                                    .checkbox
+                                        label
+                                            input(type="checkbox")
+                                            | Microsoft
                     .form-group
                         .col-sm-offset-3.col-sm-9
                             button.btn.btn-primary.btn-lg#submit Submit
