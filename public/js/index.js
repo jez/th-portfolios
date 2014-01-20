@@ -117,7 +117,7 @@ app.init = function() {
                         xhr.onreadystatechange = function() {
                             if(xhr.readyState === 4){
                                 if(xhr.status === 200 || xhr.status === 201 || xhr.status === 204 ) {
-                                    $('#succes-button').click(function(e) {
+                                    $('#success-button').click(function(e) {
                                         location.reload();
                                     });
                                     $('#success-message').modal('show');
