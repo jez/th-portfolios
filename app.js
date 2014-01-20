@@ -41,7 +41,7 @@ if ('development' == app.get('env')) {
 //===============================================
 
 app.get('/', require('./routes/index')());
-app.post('/upload', require('./routes/upload')(db));
+app.post('/upload/', require('./routes/upload')(db));
 app.get('/resumes/', require('./routes/resumes')(db));
 app.get('/all/resumes.:format', require('./routes/all')(db));
 app.get(/^\/resumes\/(\w+)\/([A-Za-z-]+)\.(\w{2,4})$/, require('./routes/resumes')(db));

@@ -83,60 +83,44 @@ app.init = function() {
                 body.companies.push(company);
                 body[company] = true;
             });
+            body.file = $('#input-file')[0].files[0];
+            var fd = new FormData();
+
+            fd.append('name', body.name);
+            fd.append('email', body.email);
+            fd.append('andrewid', body.name);
+            fd.append('class', body.name);
+            fd.append('major', body.name);
+            fd.append('minor', body.name);
+            fd.append('portfolio', body.name);
+            fd.append('link', body.name);
+            fd.append('github', body.name);
+            fd.append('companies', body.companies);
+
             if(resume) {
-                // SUPER HACKY BECAUSE AWS SUCKS
-                $('#input-class input').removeAttr('name');
-                $('#form input[name="x-amz-meta-andrewid"]').attr('value', body.andrewid);
-                body.resume = 'uploads/' + body.andrewid + '-' + Math.floor(new Date().getTime() / 1000);
-                $('#form input[name="key"]').attr('value', body.resume);
-                $.ajax('/upload', {
-                    data: body,
-                    error: function(jqXHR, textStatus, errorThrown) {
-                        $('#input-class input').attr('name', 'options');
-                        $('#error-text').html('Error: ' + errorThrown + ', ' + jqXHR.responseText);
+                body.resume = body.andrewid + '-' + Math.floor(new Date().getTime() / 1000);
+                fd.append('resume', body.name);
+                fd.append('file', body.file);
+            } 
+
+            var xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function() {
+                if(xhr.readyState === 4){
+                    if(xhr.status === 200 || xhr.status === 201 || xhr.status === 204 ) {
+                        $('#success-button').click(function(e) {
+                            // location.reload();
+                        });
+                        $('#success-message').modal('show');
+                    }
+                    else {
+                        $('#error-text').html('Error: ' + xhr.status + '. ' + xhr.responseText);
                         $('#failure-message').modal('show');
-                    },
-                    success: function(data, textStatus, jqXHR) {
-                        app.prevent = false;
-                        // TODO remove the form stuff from the index.jade
-                        // $('#form').submit();
-                        var file = $('#input-file')[0].files[0];
-                        var fd = new FormData();
+                    }
+                }
+            };
 
-                        fd.append('key', body.resume);
-                        fd.append('acl', 'public-read'); 
-                        fd.append('Content-Type', file.type);      
-                        fd.append('AWSAccessKeyId', 'AKIAILDJW47JPUE4YXUQ');
-                        fd.append('x-amz-meta-andrewid', body.andrewid);
-                        fd.append('policy', 'eyJleHBpcmF0aW9uIjogIjIwMTQtMDItMDNUMDU6MDA6MDBaIiwgImNvbmRpdGlvbnMiOiBbIHsiYnVja2V0IjogInRhcnRhbmhhY2tzMjAxNC1yZXN1bWVzIn0sIFsic3RhcnRzLXdpdGgiLCAiJGtleSIsICJ1cGxvYWRzLyJdLCB7ImFjbCI6ICJwdWJsaWMtcmVhZCJ9LCBbInN0YXJ0cy13aXRoIiwgIiR4LWFtei1tZXRhLWFuZHJld2lkIiwgIiJdLCBbInN0YXJ0cy13aXRoIiwgIiRDb250ZW50LVR5cGUiLCAiYXBwbGljYXRpb24vcGRmIl0sIF0gfQ==')
-                        fd.append('signature','+Ru1NxPLxM5q5iyQ56Q8Wr/PpdI=');
-
-                        fd.append('file', file);
-
-                        xhr = new XMLHttpRequest();
-                        xhr.onreadystatechange = function() {
-                            if(xhr.readyState === 4){
-                                if(xhr.status === 200 || xhr.status === 201 || xhr.status === 204 ) {
-                                    $('#success-button').click(function(e) {
-                                        location.reload();
-                                    });
-                                    $('#success-message').modal('show');
-                                }
-                                else {
-                                    $('#error-text').html('Error: ' + xhr.status + '. ' + xhr.responseText);
-                                    $('#failure-message').modal('show');
-                                }
-                            }
-                        };
-
-                        xhr.open('POST', 'https://tartanhacks2014-resumes.s3.amazonaws.com', true);
-                        xhr.send(fd);
-                    },
-                    type: 'POST'
-                });
-            } else {
-                console.log('TODO Redirect to /success/');
-            }
+            xhr.open('POST', '/upload/', true);
+            xhr.send(fd);
         } else {
             $('#submit').removeClass('btn-primary').addClass('btn-danger');
         }
