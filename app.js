@@ -15,26 +15,18 @@ db.ObjectID = mongo.ObjectID;
 //===============================================
 
 // all environments
-app.set('port', process.env.PORT || 3000);
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
-app.use(express.favicon());
-app.use(express.logger('dev'));
-app.use(express.json());
-app.use(express.urlencoded());
-app.use(express.methodOverride());
-app.use(express.cookieParser('meowsers'));
-app.use(express.session());
-app.use(app.router);
-app.use(express.bodyParser());
-app.use(express.static(path.join(__dirname, 'public')));
-
-
-// development only
-if ('development' == app.get('env')) {
-  app.use(express.errorHandler());
-  app.locals.pretty = true;
-}
+app.configure(function() {
+    app.set('port', process.env.PORT || 3000);
+    app.set('views', path.join(__dirname, 'views'));
+    app.set('view engine', 'jade');
+    app.use(express.bodyParser());
+    app.use(express.static(path.join(__dirname, 'public')));
+    if ('development' == app.get('env')) {
+        app.use(express.errorHandler());
+        app.locals.pretty = true;
+    }
+    app.use(app.router);
+});
 
 //===============================================
 // routes
@@ -42,9 +34,9 @@ if ('development' == app.get('env')) {
 
 app.get('/', require('./routes/index')());
 app.post('/upload/', require('./routes/upload')(db));
-app.get('/resumes/', require('./routes/resumes')(db));
-app.get('/all/resumes.:format', require('./routes/all')(db));
-app.get(/^\/resumes\/(\w+)\/([A-Za-z-]+)\.(\w{2,4})$/, require('./routes/resumes')(db));
+// app.get('/resumes/', require('./routes/resumes')(db));
+// app.get('/all/resumes.:format', require('./routes/all')(db));
+// app.get(/^\/resumes\/(\w+)\/([A-Za-z-]+)\.(\w{2,4})$/, require('./routes/resumes')(db));
 
 app.listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));

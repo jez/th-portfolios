@@ -1,3 +1,12 @@
+mixin radiobutton(name, value)
+    input.radio-inline(type="radio", name=name, value=value.toLowerCase())
+    = ' ' + value
+mixin checkbox(name, value)
+    .checkbox
+        label
+            input(type="checkbox", name=name, value=value)
+            = ' ' + value
+    
 extends base
 block header
     link(rel="stylesheet" type="text/css" href="/css/index.css")
@@ -8,59 +17,50 @@ block content
                 small Portfolio Manager
         .row
             .col-md-8.col-md-offset-2
-                form.form-horizontal#form(role="form", method="post", enctype="multipart/form-data", action="/upload/")
+                form.form-horizontal#form(role="form", method="post", enctype="multipart/form-data", action="/upload/", target="form-result")
                     .form-group
                         label.col-sm-3.control-label Name*
                         .col-sm-9
-                            input.form-control#input-name(type="text", placeholder="Andrew Carnegie")
+                            input.form-control#input-name(type="text", placeholder="Andrew Carnegie", name="name")
                     .form-group
                         label.col-sm-3.control-label Preferred Email*
                         .col-sm-9
-                            input.form-control#input-email(type="email", placeholder="andrew@carnegie.biz")
+                            input.form-control#input-email(type="email", placeholder="andrew@carnegie.biz", name="email")
                     .form-group
                         label.col-sm-3.control-label Andrew ID*
                         .col-sm-9
-                            input.form-control#input-andrewid(type="text", placeholder="acarnegie")
+                            input.form-control#input-andrewid(type="text", placeholder="andrewc", name="andrewid")
                     .form-group
                         label.col-sm-3.control-label Class standing*
-                        .col-sm-9
-                            .btn-group#input-class(data-toggle="buttons")
-                                label.btn.btn-default
-                                    input(type="radio", name="options")
-                                    | Freshman
-                                label.btn.btn-default
-                                    input(type="radio", name="options")
-                                    | Sophomore
-                                label.btn.btn-default
-                                    input(type="radio", name="options")
-                                    | Junior
-                                label.btn.btn-default
-                                    input(type="radio", name="options")
-                                    | Senior
+                        .col-sm-9#input-class
+                            +radiobutton('class', 'Freshman')
+                            +radiobutton('class', 'Sophomore')
+                            +radiobutton('class', 'Junior')
+                            +radiobutton('class', 'Senior')
                     .form-group
                         label.col-sm-3.control-label Major*
                         .col-sm-9
-                            input.form-control#input-major(type="text", placeholder="Computer Science")
+                            input.form-control#input-major(type="text", placeholder="Computer Science", name="major")
                     .form-group
                         label.col-sm-3.control-label Minor/Additional Major
                         .col-sm-9
-                            input.form-control#input-minor(type="text", placeholder="Human-Computer Interaction")
+                            input.form-control#input-minor(type="text", placeholder="Human-Computer Interaction", name="text")
                     .form-group
                         label.col-sm-3.control-label Portfolio
                         .col-sm-9
-                            input.form-control#input-portfolio(type="text", placeholder="example.com/about")
+                            input.form-control#input-portfolio(type="text", placeholder="example.com/about", name="portfolio")
                     .form-group
                         label.col-sm-3.control-label Additional Link
                         .col-sm-9
-                            input.form-control#input-link(type="text", placeholder="optional")
+                            input.form-control#input-link(type="text", placeholder="optional", name="type")
                     .form-group
                         label.col-sm-3.control-label GitHub Username
                         .col-sm-9
-                            input.form-control#input-github(type="text", placeholder="acarnegie")
+                            input.form-control#input-github(type="text", placeholder="acarnegie", name="github")
                     .form-group
                         label.col-sm-3.control-label Resume
                         .col-sm-9
-                            input.btn.btn-default.form-control#input-file(name="file",type="file")
+                            input.btn.btn-default.form-control#input-file(name="resume",type="file", accept="application/pdf")
                             button.btn.btn-default#input-file-button Upload a PDF
                             label#input-filename
                     .form-group
@@ -68,38 +68,18 @@ block content
                         .col-sm-9
                             .row
                                 .col-md-4
-                                    .checkbox
-                                        label
-                                            input(type="checkbox")
-                                            | a16z
-                                    .checkbox
-                                        label
-                                            input(type="checkbox")
-                                            | AWS
-                                    .checkbox
-                                        label
-                                            input(type="checkbox")
-                                            | Apple
-                                    .checkbox
-                                        label
-                                            input(type="checkbox")
-                                            | Bloomberg
+                                    +checkbox('companies', 'a16z')
+                                    +checkbox('companies', 'AWS')
+                                    +checkbox('companies', 'Apple')
+                                    +checkbox('companies', 'Bloomberg')
                                 .col-md-4
-                                    .checkbox
-                                        label
-                                            input(type="checkbox")
-                                            | Dropbox
-                                    .checkbox
-                                        label
-                                            input(type="checkbox")
-                                            | Facebook
-                                    .checkbox
-                                        label
-                                            input(type="checkbox")
-                                            | Microsoft
+                                    +checkbox('companies', 'Dropbox')
+                                    +checkbox('companies', 'Facebook')
+                                    +checkbox('companies', 'Microsoft')
                     .form-group
                         .col-sm-offset-3.col-sm-9
-                            button.btn.btn-primary.btn-lg#submit Submit
+                            button.btn.btn-primary.btn-lg#submit(type="submit") Submit
+    iframe.hidden#form-result(name="form-result")
     .modal.fade#failure-message(tabindex="-1", role="dialog", aria-labelledby="failure-message", aria-hidden="true")
         .modal-dialog
             .modal-content
