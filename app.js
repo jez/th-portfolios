@@ -31,7 +31,6 @@ app.configure(function() {
 //===============================================
 // routes
 //===============================================
-
 app.get('/', require('./routes/index')());
 app.post('/upload/', require('./routes/upload')(db));
 // app.get('/resumes/', require('./routes/resumes')(db));
