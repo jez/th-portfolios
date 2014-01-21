@@ -1,105 +1,94 @@
-mixin radiobutton(name, value)
-    input.radio-inline(type="radio", name=name, value=value.toLowerCase())
-    = ' ' + value
-mixin checkbox(name, value)
-    .checkbox
-        label
-            input(type="checkbox", name=name, value=value)
-            = ' ' + value
-    
-extends base
+doctype html
+html
+  head
+    meta(charset="utf-8")
+    meta(name="viewport" content="width=device-width, initial-scale=1.0")
+
+    link(rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css")
+    link(rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css")
 block header
-    link(rel="stylesheet" type="text/css" href="/css/index.css")
+  link(rel="stylesheet" type="text/css" href="/css/index.css")
 block content
-    .container
-        .jumbotron#title
-            h1.text-center TartanHacks 
-                small Portfolio Manager
-        .row
-            .col-md-8.col-md-offset-2
-                form.form-horizontal#form(role="form", method="post", enctype="multipart/form-data", action="/upload/", target="form-result")
-                    .form-group
-                        label.col-sm-3.control-label Name*
-                        .col-sm-9
-                            input.form-control#input-name(type="text", placeholder="Andrew Carnegie", name="name")
-                    .form-group
-                        label.col-sm-3.control-label Preferred Email*
-                        .col-sm-9
-                            input.form-control#input-email(type="email", placeholder="andrew@carnegie.biz", name="email")
-                    .form-group
-                        label.col-sm-3.control-label Andrew ID*
-                        .col-sm-9
-                            input.form-control#input-andrewid(type="text", placeholder="andrewc", name="andrewid")
-                    .form-group
-                        label.col-sm-3.control-label Class standing*
-                        .col-sm-9#input-class
-                            +radiobutton('class', 'Freshman')
-                            +radiobutton('class', 'Sophomore')
-                            +radiobutton('class', 'Junior')
-                            +radiobutton('class', 'Senior')
-                    .form-group
-                        label.col-sm-3.control-label Major*
-                        .col-sm-9
-                            input.form-control#input-major(type="text", placeholder="Computer Science", name="major")
-                    .form-group
-                        label.col-sm-3.control-label Minor/Additional Major
-                        .col-sm-9
-                            input.form-control#input-minor(type="text", placeholder="Human-Computer Interaction", name="text")
-                    .form-group
-                        label.col-sm-3.control-label Portfolio
-                        .col-sm-9
-                            input.form-control#input-portfolio(type="text", placeholder="example.com/about", name="portfolio")
-                    .form-group
-                        label.col-sm-3.control-label Additional Link
-                        .col-sm-9
-                            input.form-control#input-link(type="text", placeholder="optional", name="type")
-                    .form-group
-                        label.col-sm-3.control-label GitHub Username
-                        .col-sm-9
-                            input.form-control#input-github(type="text", placeholder="acarnegie", name="github")
-                    .form-group
-                        label.col-sm-3.control-label Resume
-                        .col-sm-9
-                            input.btn.btn-default.form-control#input-file(name="resume",type="file", accept="application/pdf")
-                            button.btn.btn-default#input-file-button Upload a PDF
-                            label#input-filename
-                    .form-group
-                        label.col-sm-3.control-label Interested in...
-                        .col-sm-9
-                            .row
-                                .col-md-4
-                                    +checkbox('companies', 'a16z')
-                                    +checkbox('companies', 'AWS')
-                                    +checkbox('companies', 'Apple')
-                                    +checkbox('companies', 'Bloomberg')
-                                .col-md-4
-                                    +checkbox('companies', 'Dropbox')
-                                    +checkbox('companies', 'Facebook')
-                                    +checkbox('companies', 'Microsoft')
-                    .form-group
-                        .col-sm-offset-3.col-sm-9
-                            button.btn.btn-primary.btn-lg#submit(type="submit") Submit
-    iframe.hidden#form-result(name="form-result")
-    .modal.fade#failure-message(tabindex="-1", role="dialog", aria-labelledby="failure-message", aria-hidden="true")
-        .modal-dialog
-            .modal-content
-                .modal-body
-                    .alert.alert-danger
-                        h4.modal-title Something went wrong...
-                        p Something went wrong when trying to submit your portfolio. It was probably our fault, so just try one more time. If that still doesn't fix it, let me know at jake (at) scottylabs (dot) org. Sorry!
-                        p#error-text
-                .modal-footer
-                    button.btn.btn-default.btn-lg(data-dismiss="modal") Okay
-    .modal.fade#success-message(tabindex="-1", role="dialog", aria-labelledby="success-message", aria-hidden="true")
-        .modal-dialog
-            .modal-content
-                .modal-body
-                    .alert.alert-success
-                        h4.modal-title Congratulations!
-                        p Everything completed successfully. We hope you had a great time at TartanHacks!
-                        p Happy hacking :D
-                .modal-footer
-                    button.btn.btn-default.btn-lg#success-button(data-dismiss="modal") Okay
+  .container
+    .jumbotron#title
+      h1.text-center TartanHacks 
+        small Portfolio Manager
+  .row
+    .col-md-8.col-md-offset-2
+      form.form-horizontal#form(role="form", method="post", enctype="multipart/form-data", action="/upload/", target="form-result")
+        mixin textfield(label, type, placeholder, name)
+          .form-group
+            label.col-sm-3.control-label= label
+            .col-sm-9
+              input.form-control(id='input-' + name, type=type, placeholder=placeholder, name=name)
+        +textfield('Preferred Email*', 'email', 'acarnegie@cmu.edu', 'email')
+        +textfield('Andrew ID*', 'text', 'andrewc', 'andrewid')
+        .form-group
+          label.col-sm-3.control-label Class standing*
+          .col-sm-9#input-class
+            mixin radiobutton(name, value)
+              input.radio-inline(type="radio", name=name, value=value.toLowerCase())
+                = ' ' + value
+            +radiobutton('class', 'Freshman')
+            +radiobutton('class', 'Sophomore')
+            +radiobutton('class', 'Junior')
+            +radiobutton('class', 'Senior')
+        +textfield('Major*', 'text', 'Computer Science', 'major')
+        +textfield('Minor/Additional Major', 'text', 'Human-Computer Interaction', 'minor')
+        +textfield('Portfolio', 'text', 'www.mysite.exapmle.com', 'portfolio')
+        +textfield('Additional Link', 'text', 'optional', 'link')
+        +textfield('GitHub Username', 'text', 'acarnegie', 'github')
+        .form-group
+          label.col-sm-3.control-label Resume
+          .col-sm-9
+            input.btn.btn-default.form-control#input-file(name="resume",type="file", accept="application/pdf")
+            button.btn.btn-default#input-file-button Upload a PDF
+            label#input-filename
+        .form-group
+          label.col-sm-3.control-label Interested in...
+          .col-sm-9
+            .row
+              .col-md-4
+                mixin checkbox(name, value)
+                  .checkbox
+                    label
+                      input(type="checkbox", name=name, value=value)
+                        = ' ' + value
+                +checkbox('companies', 'a16z')
+                +checkbox('companies', 'AWS')
+                +checkbox('companies', 'Apple')
+                +checkbox('companies', 'Bloomberg')
+              .col-md-4
+                +checkbox('companies', 'Dropbox')
+                +checkbox('companies', 'Facebook')
+                +checkbox('companies', 'Microsoft')
+              .form-group
+                .col-sm-offset-3.col-sm-9
+                  button.btn.btn-primary.btn-lg#submit(type="submit") Submit
+  #form-result
+    iframe.hidden(name="form-result")
+  .modal.fade#failure-message(tabindex="-1", role="dialog", aria-labelledby="failure-message", aria-hidden="true")
+    .modal-dialog
+      .modal-content
+        .modal-body
+          .alert.alert-danger
+            h4.modal-title Something went wrong...
+            p Something went wrong when trying to submit your portfolio. It was probably our fault, so just try one more time. If that still doesn't fix it, let me know at jake (at) scottylabs (dot) org. Sorry!
+            p#error-text
+          .modal-footer
+            button.btn.btn-default.btn-lg(data-dismiss="modal") Okay
+  .modal.fade#success-message(tabindex="-1", role="dialog", aria-labelledby="success-message", aria-hidden="true")
+    .modal-dialog
+      .modal-content
+        .modal-body
+          .alert.alert-success
+            h4.modal-title Congratulations!
+            p Everything completed successfully. We hope you had a great time at TartanHacks!
+            p Happy hacking :D
+          .modal-footer
+            button.btn.btn-default.btn-lg#success-button(data-dismiss="modal") Okay
 
 block script
-    script(src="/js/index.js")
+  script(type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js")
+  script(src="//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js")
+  script(src="/js/index.js")
