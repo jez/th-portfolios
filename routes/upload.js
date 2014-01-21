@@ -1,4 +1,4 @@
-var fs = require('fs');
+// var fs = require('fs');
 var qfs = require('q-io/fs');
 var sponsors = ['a16z', 'aws', 'apple', 'bloomberg', 'dropbox', 'facebook', 'microsoft']
 
@@ -19,50 +19,44 @@ module.exports = function(db) {
       res.send(400, "Don't screw with me. Format your data correctly.");
     }
 
-    try {
       var portfolios = db.get('portfolios');
       portfolios.find({'andrewid': req.body.andrewid}, {}, function(err, docs) {
         if (err) {
           res.send(500, 'Error querying database. Error: ' + err.toString());
         } else if (docs.length !== 0){
           var old_resume = docs[0].resume;
+          if(old_resume) {
+            sponsors.concat('uploads').forEach(function(folder, i, dels) {
+              qfs.exists(__dirname + '/' + folder + '/' + old_resume)
+              .then(function() {
+                qfs.remove(__dirname + '/' + folder + '/' + old_resume)
+                .catch(function() {
+                  res.send(500, 'Error deleting old resume');
+                });
+              });
+            });
+          }
           if(req.files) {
-            fs.readFile(req.files.resume.path, function(err, data) {
-              req.body.resume = req.body.andrewid + '-' + Math.floor(new Date().getTime());
-              fs.writeFile(__dirname + '/uploads/' + req.body.resume, data, function(err) {
-                if(err) {
-                  res.send(500, 'Error saving file to uploads folder.');
+            req.body.resume = req.body.andrewid + '-' + Math.floor(new Date().getTime());
+            var resumePromise = qfs.read(req.files.resume.path, 'b');
+            resumePromise.then(function(resumeData) {
+              qfs.write(__dirname + '../uploads/' + req.body.resume, resumeData)
+              .catch(function(error) {
+                res.send(500, 'Error saving file to uploads folder.');
+              });
+            });
+            portfolios.update({'andrewid': req.body.andrewid}, 
+              {$set: req.body}, function(err) {
+                if (err) {
+                  res.send(500, 'Error updating user portfolio for ' + req.body.andrewid);
                 } else {
-                  if(old_resume) {
-                    fs.unlink(__dirname + '/uploads/' + old_resume, function(err) {
-                      if(err) {
-                        res.send(500, 'Error deleting old resume');
-                      }
-                    });
-                    sponsors.forEach(function(elem, index, arr) {
-                      if(fs.existsSync(__dirname + '/' + elem + '/' + old_resume)) {
-                        fs.unlinkSync(__dirname + '/' + elem + '/' + old_resume);
-                      }
-                    });
-                  }
-                  portfolios.update({'andrewid': req.body.andrewid}, 
-                    {$set: req.body}, function(err) {
-                      if (err) {
-                        res.send(500, 'Error updating user portfolio for ' + req.body.andrewid);
-                      } else {
-                        req.body.companies.forEach(function(elem, i, arr) {
-                          var otherdata = fs.readFileSync(req.files.resume.path);
-                          try {
-                            fs.writeFileSync(__dirname + '/' + elem.toLowerCase() + '/' + req.body.resume, otherdata);
-                          } catch (e) {
-                                res.send(500, 'Error saving to directory ' + elem.toLowerCase());
-                          }
-                        });
-                        res.send('Success');
-                      }
+                  req.body.companies.forEach(function(elem, i, arr) {
+                  qfs.read(req.files.resume.path);
+                      fs.writeFileSync(__dirname + '/' + elem.toLowerCase() + '/' + req.body.resume, otherdata);
+                          res.send(500, 'Error saving to directory ' + elem.toLowerCase());
                   });
+                  res.send('Success');
                 }
-              })
             });
           } else {
             req.body.resume = '';
@@ -120,8 +114,5 @@ module.exports = function(db) {
           }
         }
       }); 
-    } catch (e) {
-      res.send(500, 'An unexpected error occurred: ' + e.toString());
-    }
   }
 };
