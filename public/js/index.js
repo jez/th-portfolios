@@ -1,6 +1,16 @@
 ;var app = {};(function() {
   app.prevent = true;
 
+  app.alert = function(response) {
+    if(response === 'Success') {
+      console.log($('#success-message'));
+      $('#success-message').modal('show');
+      location.reload();
+    } else {
+      $('#error-text').text(response);
+      $('#failure-message').modal('show');
+    }
+  }
   app.init = function() {
     $('#input-file').change(function(e) {
       $('#input-filename').html(' ' + $(this).val().split('\\').pop());
@@ -9,23 +19,17 @@
       e.preventDefault();
       $('#input-file').click();
     });
-    $('#form-result').load(function(e) {
-      var response = $(this).text();
-      console.log(response);
-      if(reponse === 'Success') {
-        $('#success-message').modal('show');
-      } else {
-        $('#error-text').text(response);
-        $('#failure-message').modal('show');
-      }
+    var classClicked = false;
+    $('#input-class').click(function(e) {
+      classClicked = true;
     });
     $('#submit').click(function(e) {
-      console.log('Uploading...');
       var valid = true;
       var requireds = ['name', 'email', 'andrewid', 'major'];
       requireds.forEach(function(elem, i, arr) {
         var selector = '#input-' + elem;
         if(!$(selector).val()) {
+          console.log(selector);
           valid = false;
           $(selector).parents('.form-group').addClass('has-error');
           $(selector).focus(function(e) {
@@ -34,11 +38,12 @@
           });
         }
       });
-      var selector = '#input-class input';
-      if(!$(selector).val()) {
+      console.log(classClicked);
+      if(!classClicked) {
         valid = false;
+        selector = '#input-class';
         $(selector).parents('.form-group').addClass('has-error');
-        $(selector).focus(function(e) {
+        $(selector + ' input').focus(function(e) {
           $(this).parents('.form-group').removeClass('has-error');
           $('#submit').removeClass('btn-danger').addClass('btn-primary');
         });
