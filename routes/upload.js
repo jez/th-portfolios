@@ -16,7 +16,7 @@ module.exports = function(db) {
             req.files.resume.size < 1048576 && 
             req.files.resume.type == 'application/pdf')))) 
     {
-      res.render('script', {message: "Don't screw with me. Format your data correctly."});
+      res.render('script', {message: "Missing required fields. Try submitting again."});
     }
 
     try {

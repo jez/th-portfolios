@@ -5,7 +5,6 @@
     if(response === 'Success') {
       console.log($('#success-message'));
       $('#success-message').modal('show');
-      location.reload();
     } else {
       $('#error-text').text(response);
       $('#failure-message').modal('show');
@@ -18,6 +17,9 @@
     $('#input-file-button').click(function(e) {
       e.preventDefault();
       $('#input-file').click();
+    });
+    $('#success-button').click(function(e) {
+      location.reload();
     });
     var classClicked = false;
     $('#input-class input').focus(function(e) {
