@@ -20,7 +20,7 @@
       $('#input-file').click();
     });
     var classClicked = false;
-    $('#input-class').click(function(e) {
+    $('#input-class input').focus(function(e) {
       classClicked = true;
     });
     $('#submit').click(function(e) {
