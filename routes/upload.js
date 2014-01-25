@@ -1,5 +1,6 @@
 var fs = require('fs');
 var qfs = require('q-io/fs');
+var Promise = require('q');
 var sponsors = ['a16z', 'aws', 'apple', 'bloomberg', 'dropbox', 'facebook', 'microsoft']
 
 module.exports = function(db) {
@@ -27,50 +28,57 @@ module.exports = function(db) {
         } else if (docs.length !== 0){
           var old_resume = docs[0].resume;
           if(req.files) {
-            fs.readFile(req.files.resume.path, function(err, data) {
+            qfs.read(req.files.resume.path, 'b')
+            .then(function(data) {
               req.body.resume = req.body.andrewid + '-' + Math.floor(new Date().getTime());
-              fs.writeFile(__dirname + '/uploads/' + req.body.resume, data, function(err) {
-                if(err) {
-                  res.render('script', {message: 'Error saving file to uploads folder.'});
-                } else {
-                  if(old_resume) {
-                    fs.unlink(__dirname + '/uploads/' + old_resume, function(err) {
-                      if(err) {
-                        res.render('script', {message: 'Error deleting old resume'});
-                      }
-                    });
-                    sponsors.forEach(function(elem, index, arr) {
-                      if(fs.existsSync(__dirname + '/' + elem + '/' + old_resume)) {
-                        fs.unlinkSync(__dirname + '/' + elem + '/' + old_resume);
-                      }
-                    });
-                  }
-                  portfolios.update({'andrewid': req.body.andrewid}, 
-                    {$set: req.body}, function(err) {
-                      if (err) {
-                        res.render('script', {message: 'Error updating user portfolio for ' + req.body.andrewid});
-                      } else {
-                        req.body.companies.forEach(function(elem, i, arr) {
-                          var otherdata = fs.readFileSync(req.files.resume.path);
-                          try {
-                            fs.writeFileSync(__dirname + '/' + elem.toLowerCase() + '/' + req.body.resume, otherdata);
-                          } catch (e) {
-                                res.render('script', {message: 'Error saving to directory ' + elem.toLowerCase()});
-                          }
-                        });
-                        res.render('script', {message: 'Success'});
-                      }
+              qfs.write(__dirname + '/uploads/' + req.body.resume, data, 'b')
+              .then(function() {
+                if(old_resume) {
+                  qfs.remove(__dirname + '/uploads/' + old_resume)
+                  .then(undefined, function(err) {
+                    res.render('script', {message: 'Error deleting old resume.'});
                   });
                 }
-              })
+                var removeOne = function(company) {
+                  qfs.exists(__dirname + '/' + company + '/' + old_resume)
+                  .then(function() {
+                    qfs.remove((__dirname + '/' + company + '/' + old_resume));
+                  });
+                }
+                var oldCompanies = sponsors.map(removeOne);
+                Promise.all(oldCompanies);
+                portfolios.update({'andrewid': req.body.andrewid}, 
+                  {$set: req.body}, function(err) {
+                    if (err) {
+                      res.render('script', {message: 'Error updating user portfolio for ' + req.body.andrewid});
+                    } else {
+                      var addOne = function(company) {
+                        qfs.read(req.files.resume.path, 'b')
+                        .then(function(data) {
+                          qfs.write(__dirname + '/' + elem.toLowerCase() + '/' + req.body.resume, data, 'b');
+                        }, function(err) {
+                          res.render('script', {message: 'Error saving to directory ' + company.toLowerCase()});
+                        });
+                      }
+                      var newCompanies = req.body.companies.map(addOne);
+                      Promise.all(newCompanies).then(function() {
+                        res.render('script', {message: 'Success'});
+                      });
+                    }
+                });
+              }, 
+              function(err) {
+                res.render('script', {message: 'Error saving file to uploads folder.'});
+              });
+            }, function(err) {
+              res.render('script', {message: 'Error reading file from upload.'});
             });
           } else {
             req.body.resume = '';
             if(old_resume) {
-              fs.unlink(old_resume, function(err) {
-                if(err) {
+              qfs.remove(old_resum)
+              .then(undefined, function(err) {
                   res.render('script', {message: 'Error deleting old resume'});
-                }
               });
             }
             portfolios.update({'andrewid': req.body.andrewid}, 
@@ -84,31 +92,39 @@ module.exports = function(db) {
           }
         } else {
           if(req.files) {
-            fs.readFile(req.files.resume.path, function(err, data) {
+            qfs.read(req.files.resume.path, 'b')
+            .then(function(data) {
               req.body.resume = req.body.andrewid + '-' + Math.floor(new Date().getTime());
-              fs.writeFile(__dirname + '/uploads/' + req.body.resume, data, function(err) {
-                if(err) {
-                  res.render('script', {message: 'Error saving file to uploads folder.'});
-                } else {
-                  portfolios.insert(req.body, {}, function(err) {
-                    if (err) {
-                      res.render('script', {message: 'Error creating user portfolio for ' + req.body.andrewid});
-                    } else {
-                      req.body.companies.forEach(function(elem, i, arr) {
-                        fs.readFile(req.files.resume.path, function(err, otherdata) {
-                          fs.writeFile(__dirname + '/' + elem.toLowerCase() + '/' + req.body.resume, otherdata, function(err) {
-                            if(err) {
-                              res.render('script', {message: 'Error saving to directory ' + elem.toLowerCase()});
-                            }
-                          });
-                        });
+              console.log(req.body.resume);
+              console.log(__dirname + '/uploads/' + req.body.resume);
+              qfs.write(__dirname + '/uploads/' + req.body.resume, data, 'b')
+              .then(function() {
+                portfolios.insert(req.body, {}, function(err) {
+                  if (err) {
+                    res.render('script', {message: 'Error creating user portfolio for ' + req.body.andrewid});
+                  } else {
+                    var addOne = function(company) {
+                      qfs.read(req.files.resume.path, 'b')
+                      .then(function(data) {
+                        qfs.write(__dirname + '/' + elem.toLowerCase() + '/' + req.body.resume, data, 'b');
+                      }, function(err) {
+                        res.render('script', {message: 'Error saving to directory ' + company.toLowerCase()});
                       });
-                      res.render('script', {message: 'Success'});
                     }
-                  });
-                }
-              })
-            });
+                    var newResumes = req.body.companies.map(addOne);
+                    Promise.all(newResumes).then(function() {
+                      res.render('script', {message: 'Success'});
+                    });
+                  }
+                });
+              }, function(err) {
+                console.log('it actually was this one.');
+                console.log(err);
+                res.render('script', {message: 'Error saving file to uploads folder.'});
+              });
+            }, function(err) {
+              res.render('script', {message: 'Error reading uploaded file.'});
+            })
           } else {
             portfolios.insert(req.body, {}, function(err) {
               if(err) {
