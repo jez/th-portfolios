@@ -106,17 +106,22 @@ module.exports = function(db) {
               console.log(__dirname + '/uploads/' + req.body.resume);
               qfs.write(__dirname + '/uploads/' + req.body.resume, data, 'wb')
               .then(function() {
+                console.trace();
                 portfolios.insert(req.body, {}, function(err) {
                   if (err) {
                     res.render('script', {message: 'Error creating user portfolio for ' + req.body.andrewid});
                   } else {
+                    console.trace();
                     var addOne = function(company) {
                       return qfs.read(req.files.resume.path, 'b')
                     }
                     var newResumes = req.body.companies.map(addOne);
                     Promise.all(newResumes).then(function(data) {
+                      // TODO Alright, so now we've read every file. How do we write them all out?
+                      console.trace();
                       qfs.write(__dirname + '/' + elem.toLowerCase() + '/' + req.body.resume, data, 'b')
                       .then(function() {
+                        console.trace();
                         res.render('script', {message: 'Success'});
                       }, function(err) {
                         res.render('script', {message: 'Error saving to directory ' + company.toLowerCase()});
