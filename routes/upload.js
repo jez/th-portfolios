@@ -53,16 +53,18 @@ module.exports = function(db) {
                       res.render('script', {message: 'Error updating user portfolio for ' + req.body.andrewid});
                     } else {
                       var addOne = function(company) {
-                        qfs.read(req.files.resume.path, 'b')
-                        .then(function(data) {
-                          qfs.write(__dirname + '/' + elem.toLowerCase() + '/' + req.body.resume, data, 'b');
+                        return qfs.read(req.files.resume.path, 'b')
+                      }
+                      var newCompanies = req.body.companies.map(addOne);
+                      Promise.all(newCompanies).then(function(data) {
+                        qfs.write(__dirname + '/' + elem.toLowerCase() + '/' + req.body.resume, data, 'b')
+                        .then(function() {
+                          res.render('script', {message: 'Success'});
                         }, function(err) {
                           res.render('script', {message: 'Error saving to directory ' + company.toLowerCase()});
                         });
-                      }
-                      var newCompanies = req.body.companies.map(addOne);
-                      Promise.all(newCompanies).then(function() {
-                        res.render('script', {message: 'Success'});
+                      }, function(err) {
+                        res.render('script', {message: 'Error reading from directory ' + company.toLowerCase()});
                       });
                     }
                 });
@@ -97,23 +99,25 @@ module.exports = function(db) {
               req.body.resume = req.body.andrewid + '-' + Math.floor(new Date().getTime());
               console.log(req.body.resume);
               console.log(__dirname + '/uploads/' + req.body.resume);
-              qfs.write(__dirname + '/uploads/' + req.body.resume, data, 'b')
+              qfs.write(__dirname + '/uploads/' + req.body.resume, data, 'wb')
               .then(function() {
                 portfolios.insert(req.body, {}, function(err) {
                   if (err) {
                     res.render('script', {message: 'Error creating user portfolio for ' + req.body.andrewid});
                   } else {
                     var addOne = function(company) {
-                      qfs.read(req.files.resume.path, 'b')
-                      .then(function(data) {
-                        qfs.write(__dirname + '/' + elem.toLowerCase() + '/' + req.body.resume, data, 'b');
+                      return qfs.read(req.files.resume.path, 'b')
+                    }
+                    var newResumes = req.body.companies.map(addOne);
+                    Promise.all(newResumes).then(function(data) {
+                      qfs.write(__dirname + '/' + elem.toLowerCase() + '/' + req.body.resume, data, 'b')
+                      .then(function() {
+                        res.render('script', {message: 'Success'});
                       }, function(err) {
                         res.render('script', {message: 'Error saving to directory ' + company.toLowerCase()});
                       });
-                    }
-                    var newResumes = req.body.companies.map(addOne);
-                    Promise.all(newResumes).then(function() {
-                      res.render('script', {message: 'Success'});
+                    }, function(err) {
+                      res.render('script', {message: 'Error reading from directory ' + company.toLowerCase()});
                     });
                   }
                 });
