@@ -39,34 +39,39 @@ module.exports = function(db) {
                     res.render('script', {message: 'Error deleting old resume.'});
                   });
                 }
-                var removeOne = function(company) {
-                  qfs.exists(__dirname + '/' + company + '/' + old_resume)
-                  .then(function() {
-                    qfs.remove((__dirname + '/' + company + '/' + old_resume));
-                  });
+                var checkExists = function (company) {
+                  return fs.existsSync(__dirname + '/' + company + '/' + old_resume);
                 }
-                var oldCompanies = sponsors.map(removeOne);
-                Promise.all(oldCompanies);
-                portfolios.update({'andrewid': req.body.andrewid}, 
-                  {$set: req.body}, function(err) {
-                    if (err) {
-                      res.render('script', {message: 'Error updating user portfolio for ' + req.body.andrewid});
-                    } else {
-                      var addOne = function(company) {
-                        return qfs.read(req.files.resume.path, 'b')
-                      }
-                      var newCompanies = req.body.companies.map(addOne);
-                      Promise.all(newCompanies).then(function(data) {
-                        qfs.write(__dirname + '/' + elem.toLowerCase() + '/' + req.body.resume, data, 'b')
-                        .then(function() {
-                          res.render('script', {message: 'Success'});
+                var removeOne = function(company) {
+                  return qfs.remove(__dirname + '/' + company + '/' + old_resume);
+                }
+                var oldCompanies = sponsors.filter(checkExists).map(removeOne);
+                Promise.all(oldCompanies).then(function () {
+                  portfolios.update({'andrewid': req.body.andrewid}, 
+                    {$set: req.body}, function(err) {
+                      if (err) {
+                        res.render('script', {message: 'Error updating user portfolio for ' + req.body.andrewid});
+                      } else {
+                        var addOne = function(company) {
+                          return qfs.read(req.files.resume.path, 'b')
+                        }
+                        var newCompanies = req.body.companies.map(addOne);
+                        Promise.all(newCompanies).then(function(datas) {
+                          var writeData = function(data) {
+                            // TODO elem?
+                            return qfs.write(__dirname + '/' + elem.toLowerCase() + '/' + req.body.resume, data, 'b');
+                          }
+                          Promise.all(datas.map(writeData))
+                          .then(function() {
+                            res.render('script', {message: 'Success'});
+                          }, function(err) {
+                            res.render('script', {message: 'Error saving to directory'});
+                          });
                         }, function(err) {
-                          res.render('script', {message: 'Error saving to directory ' + company.toLowerCase()});
+                          res.render('script', {message: 'Error reading from directory'});
                         });
-                      }, function(err) {
-                        res.render('script', {message: 'Error reading from directory ' + company.toLowerCase()});
-                      });
-                    }
+                      }
+                  });
                 });
               }, 
               function(err) {
