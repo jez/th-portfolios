@@ -24,6 +24,7 @@ module.exports = function(db) {
       var portfolios = db.get('portfolios');
       portfolios.find({'andrewid': req.body.andrewid}, {}, function(err, docs) {
         if (err) {
+          console.trace(err);
           res.render('script', {message: 'Error querying database. Error: ' + err.toString()});
         } else if (docs.length !== 0){
           var old_resume = docs[0].resume;
@@ -31,11 +32,12 @@ module.exports = function(db) {
             qfs.read(req.files.resume.path, 'b')
             .then(function(data) {
               req.body.resume = req.body.andrewid + '-' + Math.floor(new Date().getTime());
-              qfs.write(__dirname + '/uploads/' + req.body.resume, data, 'b')
+              qfs.write(__dirname + '/uploads/' + req.body.resume, data, 'wb')
               .then(function() {
                 if(old_resume) {
                   qfs.remove(__dirname + '/uploads/' + old_resume)
-                  .then(undefined, function(err) {
+                  .then(null, function(err) {
+                    console.trace(err);
                     res.render('script', {message: 'Error deleting old resume.'});
                   });
                 }
@@ -50,47 +52,52 @@ module.exports = function(db) {
                   portfolios.update({'andrewid': req.body.andrewid}, 
                     {$set: req.body}, function(err) {
                       if (err) {
+                        console.trace(err);
                         res.render('script', {message: 'Error updating user portfolio for ' + req.body.andrewid});
                       } else {
                         var addOne = function(company) {
                           return qfs.read(req.files.resume.path, 'b')
                         }
-                        var newCompanies = req.body.companies.map(addOne);
-                        Promise.all(newCompanies).then(function(datas) {
-                          var writeData = function(data) {
-                            // TODO elem?
-                            return qfs.write(__dirname + '/' + elem.toLowerCase() + '/' + req.body.resume, data, 'b');
-                          }
-                          Promise.all(datas.map(writeData))
+                        Promise.all(req.body.companies.map(addOne)).then(function(datas) {
+                          var newResumes = datas.map(function(fileData, i, arr) {
+                            return qfs.write(__dirname + '/' + req.body.companies[i] + '/' + req.body.resume, data, 'wb');
+                          });
+                          Promise.all(newResumes)
                           .then(function() {
                             res.render('script', {message: 'Success'});
                           }, function(err) {
-                            res.render('script', {message: 'Error saving to directory'});
+                            console.trace(err);
+                            res.render('script', {message: 'Error saving to directory ' + err});
                           });
                         }, function(err) {
-                          res.render('script', {message: 'Error reading from directory'});
+                          console.trace(err);
+                          res.render('script', {message: 'Error reading from company directory ' + error});
                         });
                       }
                   });
                 });
               }, 
               function(err) {
+                console.trace(err);
                 res.render('script', {message: 'Error saving file to uploads folder.'});
               });
             }, function(err) {
+              console.trace(err);
               res.render('script', {message: 'Error reading file from upload.'});
             });
           } else {
             req.body.resume = '';
             if(old_resume) {
-              qfs.remove(old_resum)
-              .then(undefined, function(err) {
-                  res.render('script', {message: 'Error deleting old resume'});
+              qfs.remove(old_resume)
+              .then(null, function(err) {
+                console.trace(err);
+                res.render('script', {message: 'Error deleting old resume'});
               });
             }
             portfolios.update({'andrewid': req.body.andrewid}, 
               {$set: req.body}, function(err) {
                 if (err) {
+                  console.trace(err);
                   res.render('script', {message: 'Error updating user portfolio for ' + req.body.andrewid});
                 } else {
                   res.render('script', {message: 'Success'});
@@ -102,46 +109,45 @@ module.exports = function(db) {
             qfs.read(req.files.resume.path, 'b')
             .then(function(data) {
               req.body.resume = req.body.andrewid + '-' + Math.floor(new Date().getTime());
-              console.log(req.body.resume);
-              console.log(__dirname + '/uploads/' + req.body.resume);
               qfs.write(__dirname + '/uploads/' + req.body.resume, data, 'wb')
               .then(function() {
-                console.trace();
                 portfolios.insert(req.body, {}, function(err) {
                   if (err) {
+                    console.trace(err);
                     res.render('script', {message: 'Error creating user portfolio for ' + req.body.andrewid});
                   } else {
-                    console.trace();
                     var addOne = function(company) {
                       return qfs.read(req.files.resume.path, 'b')
                     }
-                    var newResumes = req.body.companies.map(addOne);
-                    Promise.all(newResumes).then(function(data) {
-                      // TODO Alright, so now we've read every file. How do we write them all out?
-                      console.trace();
-                      qfs.write(__dirname + '/' + elem.toLowerCase() + '/' + req.body.resume, data, 'b')
+                    Promise.all(req.body.companies.map(addOne)).then(function(datas) {
+                      var newResumes = datas.map(function(fileData, i, arr) {
+                        return qfs.write(__dirname + '/' + req.body.companies[i] + '/' + req.body.resume, data, 'wb');
+                      });
+                      Promise.all(newResumes)
                       .then(function() {
-                        console.trace();
                         res.render('script', {message: 'Success'});
                       }, function(err) {
-                        res.render('script', {message: 'Error saving to directory ' + company.toLowerCase()});
+                        console.trace(err);
+                        res.render('script', {message: 'Error saving to directory ' + err});
                       });
                     }, function(err) {
-                      res.render('script', {message: 'Error reading from directory ' + company.toLowerCase()});
+                      console.trace(err);
+                      res.render('script', {message: 'Error reading from company directory ' + error});
                     });
                   }
                 });
               }, function(err) {
-                console.log('it actually was this one.');
-                console.log(err);
+                console.trace(err);
                 res.render('script', {message: 'Error saving file to uploads folder.'});
               });
             }, function(err) {
+              console.trace(err);
               res.render('script', {message: 'Error reading uploaded file.'});
             })
           } else {
             portfolios.insert(req.body, {}, function(err) {
               if(err) {
+                console.trace(err);
                 res.render('script', {message: 'Error creating new user portfolio for ' + req.body.andrewid});
               } else {
                 res.render('script', {message: 'Success'});
