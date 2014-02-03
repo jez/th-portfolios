@@ -42,10 +42,10 @@ module.exports = function(db) {
                   });
                 }
                 var checkExists = function (company) {
-                  return fs.existsSync(__dirname + '/../uploads/' + company + '/' + old_resume);
+                  return fs.existsSync(__dirname + '/../uploads/' + company.toLowerCase() + '/' + old_resume);
                 }
                 var removeOne = function(company) {
-                  return qfs.remove(__dirname + '/../uploads/' + company + '/' + old_resume);
+                  return qfs.remove(__dirname + '/../uploads/' + company.toLowerCase() + '/' + old_resume);
                 }
                 var oldCompanies = sponsors.filter(checkExists).map(removeOne);
                 Promise.all(oldCompanies).then(function () {
@@ -60,7 +60,7 @@ module.exports = function(db) {
                         }
                         Promise.all(req.body.companies.map(addOne)).then(function(datas) {
                           var newResumes = datas.map(function(fileData, i, arr) {
-                          return qfs.write(__dirname + '/../uploads/' + req.body.companies[i] + '/' + req.body.resume, data, 'wb');
+                          return qfs.write(__dirname + '/../uploads/' + req.body.companies[i].toLowerCase() + '/' + req.body.resume, data, 'wb');
                           });
                           Promise.all(newResumes)
                           .then(function() {
@@ -121,7 +121,7 @@ module.exports = function(db) {
                     }
                     Promise.all(req.body.companies.map(addOne)).then(function(datas) {
                       var newResumes = datas.map(function(fileData, i, arr) {
-                        return qfs.write(__dirname + '/../uploads/' + req.body.companies[i] + '/' + req.body.resume, data, 'wb');
+                        return qfs.write(__dirname + '/../uploads/' + req.body.companies[i].toLowerCase() + '/' + req.body.resume, data, 'wb');
                       });
                       Promise.all(newResumes)
                       .then(function() {
