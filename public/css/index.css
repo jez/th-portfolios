@@ -1,7 +1,19 @@
-body {
-    padding-top: 50px;
+.jumbotron {
+  background: none;
+}
+
+.smallcaps {
+  font-variant: small-caps;
+}
+
+.jumbotron h1 {
+  color: #eb3f25;
 }
 
 #input-file {
     display: none;
+}
+.no-margin {
+  margin-right: 0px;
+  margin-left: 0px;
 }

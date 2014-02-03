@@ -1,6 +1,7 @@
 doctype html
 html
   head
+    title Profile Manager | TartanHacks 2014
     meta(charset="utf-8")
     meta(name="viewport", content="width=device-width, initial-scale=1.0")
 
@@ -8,12 +9,17 @@ html
     //- link(rel="stylesheet", href="/css/bootstrap.min.css")
     link(rel="stylesheet", href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css")
     link(rel="stylesheet", type="text/css" href="/css/index.css")
+    link(rel="icon", href="/images/favicon.png")
   body
     .container
       .jumbotron#title
-        h1.text-center TartanHacks 
-          small Profile Manager
-    .row
+        img.center-block(width="200", src="/images/logo.png")
+        h1.text-center T
+          span.smallcaps artan
+          | H
+          span.smallcaps acks
+          small  Profile Manager
+    .row.no-margin
       .col-md-8.col-md-offset-2
         form.form-horizontal#form(role="form", method="post", enctype="multipart/form-data", action="/upload/", target="form-result")
           mixin textfield(label, type, placeholder, name)
@@ -65,7 +71,7 @@ html
                   +checkbox('companies', 'Microsoft')
           .form-group
             .col-sm-offset-3.col-sm-9
-              button.btn.btn-primary.btn-lg#submit(type="submit") Submit
+              button.btn.btn-default.btn-lg#submit(type="submit") Submit
      #form-result
        iframe.hidden(name="form-result")
      .modal.fade#failure-message(tabindex="-1", role="dialog", aria-labelledby="failure-message", aria-hidden="true")
