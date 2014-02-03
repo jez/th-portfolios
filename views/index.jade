@@ -12,7 +12,7 @@ html
     .container
       .jumbotron#title
         h1.text-center TartanHacks 
-          small Portfolio Manager
+          small Profile Manager
     .row
       .col-md-8.col-md-offset-2
         form.form-horizontal#form(role="form", method="post", enctype="multipart/form-data", action="/upload/", target="form-result")
@@ -36,7 +36,7 @@ html
               +radiobutton('class', 'Senior')
           +textfield('Major*', 'text', 'Computer Science', 'major')
           +textfield('Minor/Additional Major', 'text', 'Human-Computer Interaction', 'minor')
-          +textfield('Portfolio', 'text', 'www.mysite.exapmle.com', 'portfolio')
+          +textfield('Website', 'text', 'www.mysite.exapmle.com', 'portfolio')
           +textfield('Additional Link', 'text', 'optional', 'link')
           +textfield('GitHub Username', 'text', 'acarnegie', 'github')
           .form-group
