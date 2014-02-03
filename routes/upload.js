@@ -32,10 +32,10 @@ module.exports = function(db) {
             qfs.read(req.files.resume.path, 'b')
             .then(function(data) {
               req.body.resume = req.body.andrewid + '-' + Math.floor(new Date().getTime());
-              qfs.write(__dirname + '/uploads/' + req.body.resume, data, 'wb')
+              qfs.write(__dirname + '../uploads/' + req.body.resume, data, 'wb')
               .then(function() {
                 if(old_resume) {
-                  qfs.remove(__dirname + '/uploads/' + old_resume)
+                  qfs.remove(__dirname + '../uploads/' + old_resume)
                   .then(null, function(err) {
                     console.trace(err);
                     res.render('script', {message: 'Error deleting old resume.'});
@@ -109,7 +109,7 @@ module.exports = function(db) {
             qfs.read(req.files.resume.path, 'b')
             .then(function(data) {
               req.body.resume = req.body.andrewid + '-' + Math.floor(new Date().getTime());
-              qfs.write(__dirname + '/uploads/' + req.body.resume, data, 'wb')
+              qfs.write(__dirname + '../uploads/' + req.body.resume, data, 'wb')
               .then(function() {
                 portfolios.insert(req.body, {}, function(err) {
                   if (err) {
