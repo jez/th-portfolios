@@ -51,6 +51,9 @@ html
               input.btn.btn-default.form-control#input-file(name="resume",type="file", accept="application/pdf")
               button.btn.btn-default#input-file-button Upload a PDF
               label#input-filename
+          +textfield('TartanHacks Team', 'text', 'optional', 'team')
+          +textfield('TartanHacks Project', 'text', 'myherokuapp.herokuapp.com', 'project')
+          +textfield('TartanHacks Source', 'text', 'github.com/acarnegie/myherokuapp', 'source')
           .form-group
             label.col-sm-3.control-label Interested in...
             .col-sm-9
