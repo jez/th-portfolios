@@ -11,13 +11,16 @@ module.exports = function(db) {
           req.body.email && 
           req.body.andrewid && 
           req.body.class && 
-          req.body.major && 
+          req.body.major) && 
           (!req.files || 
            (req.files.resume && 
             req.files.resume.size < 1048576 && 
-            req.files.resume.type == 'application/pdf')))) 
+            req.files.resume.type == 'application/pdf'))) 
     {
-      res.render('script', {message: "Missing required fields. Try submitting again."});
+      res.render('script', {message: "Missing required fields. Please include name, email, andrewid, class, and major. If you include a resume, it must be a PDF under 1 MB."});
+    }
+    if(!req.body.companies) {
+        req.body.companies = [];
     }
 
     try {
@@ -28,7 +31,8 @@ module.exports = function(db) {
           res.render('script', {message: 'Error querying database. Error: ' + err.toString()});
         } else if (docs.length !== 0){
           var old_resume = docs[0].resume;
-          if(req.files) {
+
+          if(req.files.resume.size !== 0) {  
             qfs.read(req.files.resume.path, 'b')
             .then(function(data) {
               req.body.resume = req.body.andrewid + '-' + Math.floor(new Date().getTime()) + '.pdf';
@@ -57,9 +61,6 @@ module.exports = function(db) {
                       } else {
                         var addOne = function(company) {
                           return qfs.read(req.files.resume.path, 'b')
-                        }
-                        if(!req.body.companies) {
-                            req.body.companies = [];
                         }
                         Promise.all(req.body.companies.map(addOne)).then(function(datas) {
                           var newResumes = datas.map(function(fileData, i, arr) {
@@ -91,24 +92,33 @@ module.exports = function(db) {
           } else {
             req.body.resume = '';
             if(old_resume) {
-              qfs.remove(old_resume)
+              qfs.remove(__dirname + '/../uploads/' + old_resume)
               .then(null, function(err) {
                 console.trace(err);
                 res.render('script', {message: 'Error deleting old resume'});
               });
             }
-            portfolios.update({'andrewid': req.body.andrewid}, 
-              {$set: req.body}, function(err) {
-                if (err) {
-                  console.trace(err);
-                  res.render('script', {message: 'Error updating user portfolio for ' + req.body.andrewid});
-                } else {
-                  res.render('script', {message: 'Success'});
-                }
+            var checkExists = function (company) {
+              return fs.existsSync(__dirname + '/../uploads/' + company.toLowerCase() + '/' + old_resume);
+            }
+            var removeOne = function(company) {
+              return qfs.remove(__dirname + '/../uploads/' + company.toLowerCase() + '/' + old_resume);
+            }
+            var oldCompanies = sponsors.filter(checkExists).map(removeOne);
+            Promise.all(oldCompanies).then(function () {
+              portfolios.update({'andrewid': req.body.andrewid}, 
+                {$set: req.body}, function(err) {
+                  if (err) {
+                    console.trace(err);
+                    res.render('script', {message: 'Error updating user portfolio for ' + req.body.andrewid});
+                  } else {
+                    res.render('script', {message: 'Success'});
+                  }
+              });
             });
           }
         } else {
-          if(req.files) {
+          if(req.files.resume.size !== 0) {
             qfs.read(req.files.resume.path, 'b')
             .then(function(data) {
               req.body.resume = req.body.andrewid + '-' + Math.floor(new Date().getTime()) + '.pdf';
@@ -121,9 +131,6 @@ module.exports = function(db) {
                   } else {
                     var addOne = function(company) {
                       return qfs.read(req.files.resume.path, 'b')
-                    }
-                    if(!req.body.companies) {
-                        req.body.companies = [];
                     }
                     Promise.all(req.body.companies.map(addOne)).then(function(datas) {
                       var newResumes = datas.map(function(fileData, i, arr) {
