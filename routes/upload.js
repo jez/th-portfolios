@@ -58,6 +58,9 @@ module.exports = function(db) {
                         var addOne = function(company) {
                           return qfs.read(req.files.resume.path, 'b')
                         }
+                        if(!req.body.companies) {
+                            req.body.companies = [];
+                        }
                         Promise.all(req.body.companies.map(addOne)).then(function(datas) {
                           var newResumes = datas.map(function(fileData, i, arr) {
                           return qfs.write(__dirname + '/../uploads/' + req.body.companies[i].toLowerCase() + '/' + req.body.resume, data, 'wb');
@@ -118,6 +121,9 @@ module.exports = function(db) {
                   } else {
                     var addOne = function(company) {
                       return qfs.read(req.files.resume.path, 'b')
+                    }
+                    if(!req.body.companies) {
+                        req.body.companies = [];
                     }
                     Promise.all(req.body.companies.map(addOne)).then(function(datas) {
                       var newResumes = datas.map(function(fileData, i, arr) {
